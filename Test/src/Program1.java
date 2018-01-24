@@ -1,0 +1,13 @@
+
+public class Program1 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		
+		System.out.println("ID \t"+"NAME of Food \t"+"Price \t"+"Stock"); 
+		System.out.println(10+"\t\t"+20+"\t"+50+"\t"+100); 
+		System.out.println("==========================================="); 
+
+	}
+
+}

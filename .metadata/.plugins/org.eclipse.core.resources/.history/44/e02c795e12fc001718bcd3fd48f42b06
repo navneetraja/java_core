@@ -1,0 +1,58 @@
+package bill;
+import java.util.*;
+
+
+public class BillingInfo {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		
+		
+		Admin objA=new Admin();
+		
+		
+		while(true) 
+		{
+			
+			System.out.println("Are you Admin or Customer");
+			System.out.println("If you are Admin Press :1");
+			System.out.println("If you are Customer Press :2");
+			
+			
+			
+			Scanner sc=new Scanner(System.in);
+			int ch=sc.nextInt();
+			switch(ch)
+			  {
+						case 1: boolean a=objA.authentication_Admin();
+						if(a==true)
+						{
+							System.out.println("Authentication successful");
+							objA.manageStoke();
+						}
+						else
+						{
+							System.out.println("Authentication failed");
+						}
+						break;
+				
+						case 2:System.out.println("Custumer");
+						break;
+				
+						case 3: 
+							sc.close();
+								System.out.println("Bye");
+						        return;
+						default:System.out.println("choose correct choice");
+				}
+		
+		}
+		
+		
+		
+		
+	}	
+
+}
+
+

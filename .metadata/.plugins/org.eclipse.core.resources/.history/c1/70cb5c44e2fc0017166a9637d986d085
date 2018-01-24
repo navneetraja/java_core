@@ -1,0 +1,233 @@
+package bill;
+
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Scanner;
+import java.sql.*;
+
+public class User{
+	
+		static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
+		static final String DB_URL = "jdbc:mysql://localhost/billing";
+
+   
+		static final String USER = "root";
+		static final String PASS = "";
+
+		Connection conn = null;
+		Statement stmt = null;
+   
+		Scanner sc=new Scanner(System.in);
+   
+  
+   
+		public void Purchase()
+		{
+	
+			try{
+				Class.forName("com.mysql.jdbc.Driver");
+				System.out.println("Connecting to database...");
+				conn = DriverManager.getConnection(DB_URL,USER,PASS);
+				
+				while(true)
+				{
+					System.out.println("To show the menu   Press:1");
+					System.out.println("To Order the item  Press:2");
+					System.out.println("Exit               Press:3");
+					
+					int ch=sc.nextInt();
+					switch(ch)
+					{
+					  case 1:try {
+						  			System.out.println("Display the data");
+								//System.out.println("Creating statement...");
+						  			stmt = conn.createStatement();
+                             //selecting data from the table
+						  			String sql = "SELECT * FROM stock";
+						  			ResultSet rs = stmt.executeQuery(sql);
+
+						        //STEP 5: Extract data from result set
+						  			while(rs.next()){
+								//Retrieve by column name
+						  			int item_id  = rs.getInt("item_id");
+						  			String item_name = rs.getString("item_name");
+						  			int item_price = rs.getInt("item_price");
+						  			int item_stock = rs.getInt("item_stock");
+
+								//Display values
+									//Display values
+						  			System.out.println("NAME of Food \t"+"Price \t"+"Stock");
+						  			System.out.println("==========================================="); 
+						  			System.out.println(item_name+"\t\t"+item_price+"\t"+item_stock); 
+						  			
+						  			}
+						  	}
+					  		catch(Exception e)
+					  		{
+					  			System.out.println(e);	
+					  		}
+					  		System.out.println("Do you want to Order \n For yes:press 1 \n No: Press 2");
+					  		int i=sc.nextInt();
+					  		if(i==2)
+					  		{
+					  			break;
+					  		}
+					  			
+					  case 2:try {
+						  
+						  			ArrayList<String> list=new ArrayList<String>();
+						  			ArrayList<Integer> Qty=new ArrayList<Integer>();
+						  			ArrayList<Integer> t_amt=new ArrayList<Integer>();
+						  
+						  			System.out.println("Book your item");
+						  			System.out.println("Enter Your Name");
+						  			String name=sc.next();
+						  			
+						  			
+						  			int ct=0;
+						  			int g_total=0;
+						  			do {
+						  			
+						  				System.out.println("Enter the name of Food");
+						  				String item_name=sc.next();
+						  				list.add(item_name);
+						  				System.out.println("Enter the quantity of the food");
+						  				int qty=sc.nextInt();
+						  				Qty.add(qty);
+						  				stmt = conn.createStatement();
+						  				String sql = "SELECT item_price,item_stock FROM stock where item_name='"+ item_name +"'";
+									  	ResultSet rs = stmt.executeQuery(sql);
+									  	
+									  	
+									  	if(rs.next())
+									  	{
+									  		
+									  		int price=rs.getInt("item_price");
+									  		int item_qty=rs.getInt("item_stock");
+									  		if(item_qty>qty)
+									  		{
+									  			int t_amts=qty*price;
+									  			t_amt.add(t_amts);
+									  			g_total=g_total+t_amts;
+									  			
+									  			
+									  			String sql1 = "UPDATE stock SET item_stock='"+item_qty+"' WHERE item_name='"+item_name+"'";
+										  		stmt.executeUpdate(sql1);
+									  			
+									  		}
+									  		else {
+									  			System.out.println("Unsufficient item, please ordr other item");
+									  		}
+									  	}else {
+									  		System.out.println("Sorry, this item is not available, please ordr other item ");
+									  	}
+									  	
+									  	    
+						  				
+						  			
+						  			
+						  				System.out.println("To Order another item Press :1 \n Else Peees :2");
+						  				ct=sc.nextInt();
+						  			
+						  			}while(ct==1);
+						  			
+						  			
+						  			System.out.println("Enter the type of payment mode");
+						  			String p_mode=sc.next();
+						  			
+						  			
+						  			stmt = conn.createStatement();
+						  			
+						  			//storing user information
+						  			
+						  			String sql2 = "INSERT INTO transactions(cust_name,payment,d_t) VALUES ('"+name +"','"+p_mode+"',NOW())";
+			    	            	stmt.executeUpdate(sql2);
+			    	            	System.out.println("Records has inserted  into the table");
+			    	            	
+			    	            	
+			    	            	String sql3="Select id from transaction where cust_name='"+name+"";
+			    	            	ResultSet rs = stmt.executeQuery(sql3);
+						  			
+			    	            	
+			    	            	int id=0;
+			    	            	if(rs.next())
+			    	            	{
+			    	            		id=rs.getInt("id");
+			    	            	}
+			    	            	
+			    	            	
+			    	            	
+			    	            	Iterator itr=list.iterator();  
+			    	            	Iterator qty=Qty.iterator();
+			    	            	Iterator tamt=t_amt.iterator();
+			    	            	  while(itr.hasNext()){ 
+			    	            	
+			    	            	String sql4 = "INSERT INTO total_transaction(item_name,quantity,total,t_id) VALUES ('"+itr.next() +"','"+qty.next()+"','"+qty.next()+"','"+id+"'";
+			    	            	
+			    	            	  }
+			    	            	
+		                            /* //selecting data from the table
+								  	String sql = "SELECT item_name,item_price,item_stock FROM stock where item_name='"+ item_name +"'";
+								  	ResultSet rs = stmt.executeQuery(sql);
+								  	
+								  	/*if(!(rs.next()))
+								  	{
+								  		System.out.print("Your order is not available, Please try another one!");
+								  	}
+								  	else{
+								  		//rs.previous();
+								  	int j=0;
+								  	while(j==0)
+								  	{	
+								  	 while(rs.next()){
+								  
+								  		String f_name=rs.getString("item_name");
+								  		int price=rs.getInt("item_price");
+								  		int item_qty=rs.getInt("item_stock");
+								  		
+								  		if(qty>item_qty)
+								  		{
+								  			System.out.println("Sufficient stock is not available, please try again");
+								  			break;
+								  		}
+								  		int t_price=price*qty;
+								  		System.out.println("Your payment Details");
+								  		System.out.println("Food_Name \t quantity \t Price \t Total price" );
+								  		System.out.println(f_name+"\t\t"+qty+"\t"+price+"\t"+t_price);
+								  		
+								  		item_qty=item_qty-qty;
+								  		
+								  		String sql1 = "UPDATE stock SET item_stock='"+item_qty+"' WHERE item_name='"+f_name+"'";
+								  		stmt.executeUpdate(sql1);
+								  		
+								  		//}
+								  		System.out.println("If you want to order another item Press:1");
+								  		 j=sc.nextInt();
+								  		 if(j==0)
+								  		 {
+								  			 break;
+								  		 }
+								  		
+								  	 }*/
+								  	 
+								  	//} 
+						  			
+						  		}catch(Exception e)
+					  			{
+						  			//System.out.println(e);
+						  
+					  			}
+					             break;
+					  case 3: System.out.println("Visit again");
+						  
+						       return;          
+								}
+							}
+
+			}catch(Exception e)
+			{
+				System.out.println(e);
+			}
+		}
+}
